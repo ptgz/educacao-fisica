@@ -84,11 +84,49 @@ def removeUser(userId):
     finally:
         return "OK"
 
+## PRA HOJE:::::::::
+
 def addExercise(exerciseInfo):
+    name, description, category_id, list_parent, series, reps, weight = exerciseInfo          # name, description, category_id, list_parent, series, reps, weight
+    _sendQuery(f"INSERT INTO exercise (name, description, category_id, list_parent, series, reps, weight) VALUES ('{name}','{description}', '{category_id}', '{list_parent}', '{series}', '{reps}', '{weight}')")
     pass
 
-def removeExercise(exerciseInfo):
+def removeExercise(exerciseId):
+    try:
+        _sendQuery(f'DELETE FROM exercise WHERE id=={str(exerciseId)}')
+        return "OK"
+    except:
+        return "ERROR"
     pass
+
+
+def getExercises():
+    try:
+        res = _sendQuery('SELECT id FROM exercise')
+        return res
+    except:
+        return "ERROR"
+
+def getExerciseById(exerciseId):
+    try:
+        res = _sendQuery(f'SELECT * FROM exercise WHERE id =={str(exerciseId)}')
+        return res
+    except:
+        return "ERROR"
+
+def updateExercise(exerciseId, toChange):  # tochange deve ser uma lista de dicionarios com valores a alterar, por exemplo, para alterar "name" para "joão", seria >>> [{"name" : "joão"}]
+    toQuery = []
+    for change in toChange:
+        toQuery.append(f'UPDATE exercise SET {change} = {toChange[change]} WHERE id == {exerciseId}')
+    
+    mainQuery = ";".join(toQuery)
+    try:
+        _sendQuery(mainQuery)
+        return "OK"
+    except:
+        return "ERROR"
+
+## PRA HOJE /\/\/\/\/\//\/\/\/\/\
 
 def attributeExercise(exerciseId, userId):
     pass
