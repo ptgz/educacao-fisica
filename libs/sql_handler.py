@@ -129,10 +129,58 @@ def updateExercise(exerciseId, toChange):  # tochange deve ser uma lista de dici
 ## PRA HOJE /\/\/\/\/\//\/\/\/\/\
 
 def attributeExercise(exerciseId, userId):
-    pass
+    # Verificar se os usuários existem
+    try:
+        exercise_exists = _sendQuery(f"SELECT id FROM exercise WHERE id = {exerciseId}")
+        user_exists = _sendQuery(f"SELECT id FROM user WHERE id = {userId}")
+        
+        if not exercise_exists:
+            return f"ERRO: Exercicio com ID {exerciseId} não existe."
+        
+        if not user_exists:
+            return f"ERRO: Usuario com ID {userId} não existe."
+        
+        # Atribuir o exercício ao usuário
+        _sendQuery(f"INSERT INTO user_exercise (user_id, exercise_id) VALUES ({userId}, {exerciseId})")
+        return "OK"
+    except Exception as e:
+        return f"ERROR: {str(e)}"
+
 
 def createCategory(categoryInfo):
-    pass
+    # categoryInfo deve ser uma tupla ou lista contendo o nome da categoria
+    category_name = categoryInfo[0]
+
+    # Verificar se a categoria já existe
+    existing_category = _sendQuery(f"SELECT id FROM exercise_category WHERE name = '{category_name}'")
+    
+    if existing_category:
+        return f"ERROR: Categoria '{category_name}' já existe."
+    
+    # Inserir nova categoria
+    try:
+        _sendQuery(f"INSERT INTO exercise_category (name) VALUES ('{category_name}')")
+        return "OK"
+    except Exception as e:
+        return f"ERRO: {str(e)}"
+
 
 def removeCategory(categoryId):
-    pass
+    # Verificar se a categoria existe
+    existing_category = _sendQuery(f"SELECT id FROM exercise_category WHERE id = {categoryId}")
+    
+    if not existing_category:
+        return f"ERROR: Categoria com ID {categoryId} não existe."
+
+    # Verificar se há exercícios usando essa categoria
+    associated_exercises = _sendQuery(f"SELECT id FROM exercise WHERE category_id = {categoryId}")
+    
+    if associated_exercises:
+        return "ERROR: Não é possível remover esta categoria; pois tem exercicios associados a ela."
+    
+    # Remover a categoria
+    try:
+        _sendQuery(f"DELETE FROM exercise_category WHERE id = {categoryId}")
+        return "OK"
+    except Exception as e:
+        return f"ERROR: {str(e)}"
